@@ -1,21 +1,20 @@
-# Views
+# الواجهات
 
-- [Introduction](#introduction)
-- [Creating & Rendering Views](#creating-and-rendering-views)
-    - [Nested View Directories](#nested-view-directories)
-    - [Creating The First Available View](#creating-the-first-available-view)
-    - [Determining If A View Exists](#determining-if-a-view-exists)
-- [Passing Data To Views](#passing-data-to-views)
-    - [Sharing Data With All Views](#sharing-data-with-all-views)
-- [View Composers](#view-composers)
-    - [View Creators](#view-creators)
-- [Optimizing Views](#optimizing-views)
+- [مقدمة](#introduction)
+- [إنشاء وعرض الواجهات](#creating-and-rendering-views)
+    - [ملفات الواجهات المتداخلة](#nested-view-directories)
+    - [إنشاء الواجهة الأولى للعرض](#creating-the-first-available-view)
+    - [التأكد من وجود واجهة](#determining-if-a-view-exists)
+- [تمرير البيانات للواجهات](#passing-data-to-views)
+    - [مشاركة البيانات مع الواجهات](#sharing-data-with-all-views)
+- [مؤلَفو الواجهات](#view-composers)
+    - [منشؤو الواجهات](#view-creators)
+- [تحسين أداء الواجهات](#optimizing-views)
 
 <a name="introduction"></a>
-## Introduction
+### مقدمة
 
-Of course, it's not practical to return entire HTML documents strings directly from your routes and controllers. Thankfully, views provide a convenient way to place all of our HTML in separate files. Views separate your controller / application logic from your presentation logic and are stored in the `resources/views` directory. A simple view might look something like this:
-
+القيام بتمرير سلاسل ملفات HTML بكاملها مباشرة عن طريق الموجهات والمتحكمات ليس عمليًا. لحسن الحظ، توفر ميزة الواجهات طريقةً مناسبة لوضع جميع ملفات HTML في مجلداتٍ خاصة. تعمل الواجهات على عزل طبقة منطق المشروع عن طبقة الواجهة المستعرضة إذ توضعُ كلٌ من هذه الملفات في مجلد 'resources/views'. قد تبدو واجهةُ بسيطة التصميم بالشكل التالي:
 ```blade
 <!-- View stored in resources/views/greeting.blade.php -->
 
@@ -26,7 +25,7 @@ Of course, it's not practical to return entire HTML documents strings directly f
 </html>
 ```
 
-Since this view is stored at `resources/views/greeting.blade.php`, we may return it using the global `view` helper like so:
+بما أنَّ هذه الواجهة البسيطة حُفظت في مجلد `resources/views/greeting.blade.php`, فمن الممكن جلبها عن طريق استخدام التابع المساعد 'view' والذي يكون بنطاق global كما يلي:
 
     Route::get('/', function () {
         return view('greeting', ['name' => 'James']);
@@ -35,46 +34,45 @@ Since this view is stored at `resources/views/greeting.blade.php`, we may return
 > {tip} Looking for more information on how to write Blade templates? Check out the full [Blade documentation](/docs/{{version}}/blade) to get started.
 
 <a name="creating-and-rendering-views"></a>
-## Creating & Rendering Views
+### إنشاء وعرض الواجهات
 
-You may create a view by placing a file with the `.blade.php` extension in your application's `resources/views` directory. The `.blade.php` extension informs the framework that the file contains a [Blade template](/docs/{{version}}/blade). Blade templates contain HTML as well as Blade directives that allow you to easily echo values, create "if" statements, iterate over data, and more.
+يُمكن البدء بإنشاء ملفٍ خاصٍ للواجهة بإضافة الإمتداد 'blade.php.' لنهاية ملفٍ جديد داخل 'resources/views'. إنَّ امتداد  'blade.php.' يُعطي أمرًا لإطار العمل بأن هذا الملف الجديد يحتوي على [قالب blade] (/docs/{{version}}/blade). تحتوي قوالب blade على HTML وملفاتٍ خاصة تسمح بإظهار القيم وإنشاء عباراتٍ شرطية (if statements) والمرور على البيانات بسهولة والمزيد.
 
-Once you have created a view, you may return it from one of your application's routes or controllers using the global `view` helper:
-
+بعد إنشاء واجهةٍ ما، يُمكن استدعائها عن طريق أحد الموجهات أو المتحكمات باستخدام التابع المساعد 'view' الذي يأتي بنطاق global تلقائيًا.
     Route::get('/', function () {
         return view('greeting', ['name' => 'James']);
     });
 
-Views may also be returned using the `View` facade:
+كما يُمكن جلب الواجهات باستخدام 'View'  للواجهات الساكنة.
 
     use Illuminate\Support\Facades\View;
 
     return View::make('greeting', ['name' => 'James']);
 
-As you can see, the first argument passed to the `view` helper corresponds to the name of the view file in the `resources/views` directory. The second argument is an array of data that should be made available to the view. In this case, we are passing the `name` variable, which is displayed in the view using [Blade syntax](/docs/{{version}}/blade).
+كما هو واضح، فإن أول argument توضع داخل التابع المساعد 'view' تُماثل اسم الواجهة الموجودة ضمن ملف 'resources/views'. ال argument الثانية هي صفيفة(array)  بيانات بإستطاعة الواجهة عرضها. في هذه الحالة، نقوم بتمرير المتغير 'name'، لكي يُعرض في الواجهة المكتوبة بصيغة Blade (/docs/{{version}}/blade).
 
 <a name="nested-view-directories"></a>
-### Nested View Directories
+### ملفات الواجهات المتداخلة
 
-Views may also be nested within subdirectories of the `resources/views` directory. "Dot" notation may be used to reference nested views. For example, if your view is stored at `resources/views/admin/profile.blade.php`, you may return it from one of your application's routes / controllers like so:
+قد توضع ملفات الواجهات ضمن ملفاتٍ ثانوية ضمن الملف الرئيس الموجود في `resources/views`. ومن الممكن جلب هذه الملفات باستخدام صيغة 'Dot'. كمثال، إن كان ملف الواجهة مخزنًا في `resources/views/admin/profile.blade.php`, أمكن جلب هذا الملف عن طريق إحدى الموجهات/المتحكمات بالشكل التالي:
 
     return view('admin.profile', $data);
 
 > {note} View directory names should not contain the `.` character.
 
 <a name="creating-the-first-available-view"></a>
-### Creating The First Available View
+### إنشاء الواجهة الأولى للإستعراض
 
-Using the `View` facade's `first` method, you may create the first view that exists in a given array of views. This may be useful if your application or package allows views to be customized or overwritten:
+باستخدام دالة 'first' للواجهات الساكنة، من الممكن إنشاء أول واجهةٍ ليتم عرضها من بين واجهاتٍ أخرى ضمن صفيفةٍ ما. تُفيد هذه الخاصة في حال كان التطبيق أو الحزمة يُتيحُ إمكانية تعديل أو إستبدال الواجهات:
 
     use Illuminate\Support\Facades\View;
 
     return View::first(['custom.admin', 'admin'], $data);
 
 <a name="determining-if-a-view-exists"></a>
-### Determining If A View Exists
+### التأكد من وجود واجهةٍ ما
 
-If you need to determine if a view exists, you may use the `View` facade. The `exists` method will return `true` if the view exists:
+إن كنت بحاجةٍ إلى التأكد من وجود واجهةٍ ما، فمن من الممكن استخدام 'View' في الواجهات الساكنة. باستخدام دالة 'exists'، تستطيع الحصول على قيمة 'صحيح(true) ' في حال كانت الواجهة موجودة:
 
     use Illuminate\Support\Facades\View;
 
@@ -83,24 +81,24 @@ If you need to determine if a view exists, you may use the `View` facade. The `e
     }
 
 <a name="passing-data-to-views"></a>
-## Passing Data To Views
+## تمرير البيانات إلى الواجهات
 
-As you saw in the previous examples, you may pass an array of data to views to make that data available to the view:
+كما رأينا في الأمثلة السابقة، من الممكن تمرير صفيفةٍ من البيانات إلى الواجهات لعرضها:
 
     return view('greetings', ['name' => 'Victoria']);
 
-When passing information in this manner, the data should be an array with key / value pairs. After providing data to a view, you can then access each value within your view using the data's keys, such as `<?php echo $name; ?>`.
+عند تمرير المعلومات بهذا الشكل، يجب وضع البيانات بشكل ثنائيات key/value. بعد تزويد الواجهة بالبيانات، يُمكن الوصول لكل قيمة عن طريق المفاتيح المخصصة للبيانات الموجودة، مثل `<?php echo $name; ?>`.
 
-As an alternative to passing a complete array of data to the `view` helper function, you may use the `with` method to add individual pieces of data to the view. The `with` method returns an instance of the view object so that you can continue chaining methods before returning the view:
+ومن الممكن بدلًا من أن توضع صفيفاتٍ كاملة مليئة بالبيانات داخل التابع المساعد 'view'، الاستعاضة عنها باستخدام الدالة 'with' لإضافة أجزاءٍ معينة من البيانات للواجهة. تقوم دالة 'with' بإرجاع نسخة (instance) من الكائن الموجود ضمن الواجهة وهذا يُتيح إمكانية كتابة سلسلةٍ من هذه التوابع حتى عرض الواجهة المطلوبة:
 
     return view('greeting')
                 ->with('name', 'Victoria')
                 ->with('occupation', 'Astronaut');
 
 <a name="sharing-data-with-all-views"></a>
-### Sharing Data With All Views
+### مشاركة البيانات مع جميع الواجهات
 
-Occasionally, you may need to share data with all views that are rendered by your application. You may do so using the `View` facade's `share` method. Typically, you should place calls to the `share` method within a service provider's `boot` method. You are free to add them to the `App\Providers\AppServiceProvider` class or generate a separate service provider to house them:
+في بعض الأحيان، نحتاج لمشاركة البيانات مع جميع الواجهات المعروضة في التطبيق. هذا ممكن عن طريق استخدام الدالة الخاصة بالواجهات الساكنة 'View' والتي تدعى 'share'. من الاعتيادي استدعاء دالة 'share' من داخل دالة 'boot' الموجودة في ملف مقدم الخدمات. لك الحرية في إضافة هذه الدوال إلى داخل المجلد الرئيس `App\Providers\AppServiceProvider` كصنف أو إنشاء مجلدٍ منفردٍ خاص لاحتوائها:
 
     <?php
 
